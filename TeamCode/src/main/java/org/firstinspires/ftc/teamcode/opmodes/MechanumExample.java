@@ -39,23 +39,25 @@ public class MechanumExample extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            double y = -gamepad1.left_stick_y * PARAMS.maxSpeed; // Remember, Y stick value is reversed
-            double x = -gamepad1.left_stick_x * 1.1 * PARAMS.maxSpeed; // Counteract imperfect strafing
-            double rx =  gamepad1.right_stick_x;
+            double leftStickY = -gamepad1.left_stick_y * PARAMS.maxSpeed; // Remember, leftStickY stick value is reversed
+            double leftStickX = -gamepad1.left_stick_x * PARAMS.maxSpeed; // Counteract imperfect strafing
+            double rightStickX =  gamepad1.right_stick_x;
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
-            double frontLeftPower = (y + x + rx) / denominator;
-            double backLeftPower = (y - x + rx) / denominator;
-            double frontRightPower = (y - x - rx) / denominator;
-            double backRightPower = (y + x - rx) / denominator;
+            double denominator = Math.max(Math.abs(leftStickY) + Math.abs(leftStickX) + Math.abs(rightStickX), 1);
+            double frontLeftPower = (leftStickY + leftStickX + rightStickX) / denominator;
+            double backLeftPower = (leftStickY - leftStickX + rightStickX) / denominator;
+            double frontRightPower = (leftStickY - leftStickX - rightStickX) / denominator;
+            double backRightPower = (leftStickY + leftStickX - rightStickX) / denominator;
 
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
         }
+
+
     }
 }

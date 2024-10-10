@@ -79,7 +79,6 @@ public class FieldCentric extends LinearOpMode {
 
             telemetry.addData("rx:", rx);
 
-
             prevAngle = botHeading;
 
 
