@@ -241,6 +241,19 @@ public class PrimaryOpMode extends LinearOpMode {
                 isSpinnerSpinning = true;
             }
 
+            if (gamepad2.right_bumper) {
+                leftDrive.setPower(1);
+                rightDrive.setPower(1);
+
+                leftDrive.setTargetPosition(3750);
+                rightDrive.setTargetPosition(3750);
+            } else if (gamepad2.left_bumper) {
+                leftDrive.setPower(1);
+                rightDrive.setPower(1);
+                leftDrive.setTargetPosition(0);
+                rightDrive.setTargetPosition(0);
+            }
+
              /* ######################################################
                    Runs Autonomous Actions in TeleOp - TODO: Enable
                 ###################################################### */
