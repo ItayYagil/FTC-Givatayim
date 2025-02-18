@@ -18,13 +18,11 @@ public class SlideActions {
     }
 
     private class SlideUp implements Action {
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double pos = 0.8;
-            left.setPosition(pos);
+            left.setPosition(0.5);
             right.setPosition(0);
-            return left.getPosition() != pos && right.getPosition() != pos;
+            return left.getPosition() != 0.5 && right.getPosition() != 0;
         }
     }
 
@@ -33,13 +31,11 @@ public class SlideActions {
     }
 
     private class SlideDown implements Action {
-
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double pos = 0;
-            left.setPosition(pos);
-            right.setPosition(0.8);
-            return left.getPosition() != pos && right.getPosition() != pos;
+            left.setPosition(0);
+            right.setPosition(0.5);
+            return left.getPosition() != 0 && right.getPosition() != 0.5;
         }
     }
 

@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.subsystems.complex.ComplexActions;
 import org.firstinspires.ftc.teamcode.subsystems.lift.LiftActions;
 
 import com.arcrobotics.ftclib.controller.PIDController;
@@ -27,7 +28,7 @@ public class PrimaryOpMode extends LinearOpMode {
     // private List<Action> runningActions = new ArrayList<>();
 
     public static class Params {
-        public double speedMult      = 1;
+        public double speedMult      = 0.5;
         public double turnMult       = 1;
 
         public double backMotorMult  = 1;
@@ -58,7 +59,7 @@ public class PrimaryOpMode extends LinearOpMode {
         DcMotor leftElevator  = hardwareMap.dcMotor.get("armLeft");
         DcMotor rightElevator = hardwareMap.dcMotor.get("armRight");
         DcMotor frontArm      = hardwareMap.dcMotor.get("frontArm");
-        DcMotor spinner       = hardwareMap.dcMotor.get("spinnerServo");
+        DcMotor spinner       = hardwareMap.dcMotor.get("spinner");
 
         Servo rotator         = hardwareMap.servo.get("rotatorServo");
         Servo clawServo       = hardwareMap.servo.get("clawServo");
@@ -79,14 +80,18 @@ public class PrimaryOpMode extends LinearOpMode {
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        int rightStartingPos = rightDrive.getCurrentPosition() + 150;
-        int leftStartingPos = leftDrive.getCurrentPosition() + 150;
+        int rightStartingPos = rightDrive.getCurrentPosition() + 250;
+        int leftStartingPos = leftDrive.getCurrentPosition() + 250;
         int frontStartingPos = frontArm.getCurrentPosition();
 
         rightDrive.setTargetPosition(rightStartingPos);
         leftDrive.setTargetPosition(leftStartingPos);
         rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        leftDrive.setPower(1);
+        rightDrive.setPower(1);
+
         // Reset the motor encoder so that it reads zero ticks
         frontLeftMotor      .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeftMotor       .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -140,6 +145,7 @@ public class PrimaryOpMode extends LinearOpMode {
         double botHeading  = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
 
         boolean isSpinnerSpinning = false;
+        boolean isSpinArmDown = false;
 
         while (opModeIsActive()) {
             /* ##################################################
@@ -160,17 +166,24 @@ public class PrimaryOpMode extends LinearOpMode {
             if (gamepad1.y) imu.resetYaw();
 
             // Drop the fucking nigger shit spinner thingie >:(
-            leftSpinArm.setPower(0.5);
-            sleep(175);
-            leftSpinArm.setPower(0);
+            if (!isSpinArmDown) {
+                leftSpinArm.setPower(1);
+                sleep(2000);
+                leftSpinArm.setPower(0);
+                isSpinArmDown = true;
+            }
 
-            // Lift a lil bit up
-            LiftActions liftActions = new LiftActions(hardwareMap, leftStartingPos, rightStartingPos);
-            Action liftUpAction = liftActions.liftUp();
-            new Thread(() -> {
+            // action
+            if (gamepad1.dpad_down) {
+                ComplexActions liftActions = new ComplexActions(hardwareMap, leftStartingPos, rightStartingPos);
                 TelemetryPacket packet = new TelemetryPacket();
-                while (liftUpAction.run(packet)); // Run until complete
-            }).start();
+                if (!liftActions.readySpecimen().run(packet)) {
+                    // If the action isn't finished, keep showing it
+                    telemetry.addData("Lift Action", "Running...");
+                } else {
+                    telemetry.addData("Lift Action", "Completed");
+                }
+            }
 
             /* ##################################################
                         Movement Controls Calculations
@@ -201,12 +214,6 @@ public class PrimaryOpMode extends LinearOpMode {
             }
 
             pid.setSetPoint(wantedAngle);
-            if (gamepad1.dpad_up)
-                wantedAngle = 0;
-            if (gamepad1.dpad_right)
-                wantedAngle -= 0.5 * Math.PI;
-            if (gamepad1.dpad_left)
-                wantedAngle += 0.5 * Math.PI;
 
             /* ##################################################
                                   Front Arm
@@ -224,11 +231,11 @@ public class PrimaryOpMode extends LinearOpMode {
                                 Spinner
               ################################################### */
 
-            if (gamepad1.b && isSpinnerSpinning) {
+            if (gamepad1.a && isSpinnerSpinning) {
                 spinner.setPower(0);
                 isSpinnerSpinning = false;
             }
-            else if (gamepad1.b && !isSpinnerSpinning) {
+            else if (gamepad1.a && !isSpinnerSpinning) {
                 spinner.setPower(1);
                 isSpinnerSpinning = true;
             }

@@ -50,7 +50,8 @@ public class LiftActions {
 
                 initialized = true;
             }
-            return rightDrive.isBusy() || leftDrive.isBusy();
+            //return rightDrive.isBusy() || leftDrive.isBusy();
+            return rightDrive.getCurrentPosition() == rightDrive.getTargetPosition() && leftDrive.getCurrentPosition() == leftDrive.getTargetPosition();
         }
     }
 
@@ -60,7 +61,7 @@ public class LiftActions {
 
     public class LiftDown implements Action {
         private boolean initialized = false;
-        private int ticksSafeZone = 150;
+        private int ticksSafeZone = 250;
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {

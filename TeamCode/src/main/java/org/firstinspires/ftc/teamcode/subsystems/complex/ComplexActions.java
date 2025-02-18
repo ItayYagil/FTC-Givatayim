@@ -36,64 +36,64 @@ public class ComplexActions {
         private double slidePosition = 0;
         boolean slideStatus = true;
         boolean liftStatus = true;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-
             claw.setPosition(clawPosition);
-            sleep(250);
-                if (slideStatus) {
-                    slideStatus = slideActions.SlideUp().run(packet);
-                }
-                if (liftStatus) {
-                    liftStatus = liftActions.liftUp().run(packet);
-                }
-                else rotator.setPosition(rotatorPosition);
+            if (slideStatus) {
+                slideStatus = slideActions.SlideUp().run(packet);
+            }
+            if (liftStatus) {
+                liftStatus = liftActions.liftUp().run(packet);
+            }
 
-            return rotator.getPosition() == rotatorPosition && !liftStatus;
+            // Wait until lift has finished before moving the rotator
+            if (!liftStatus) {
+                rotator.setPosition(rotatorPosition);
+            }
+
+            // Return true when lift is complete and rotator is set
+            return liftStatus && rotator.getPosition() != rotatorPosition;
         }
     }
 
     public class returnToTray implements Action {
         private double clawPosition = 0.5;
         private double rotatorPosition = 0.85;
-//        boolean clawStatus = true;
         boolean liftStatus = true;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-                if (liftStatus) {
-                    liftStatus = liftActions.liftDown().run(packet);
-                }
+            if (liftStatus) {
+                liftStatus = liftActions.liftDown().run(packet);
+            }
             claw.setPosition(clawPosition);
-            sleep(250);
-            return rotator.getPosition() == rotatorPosition && !liftStatus;
+            return !liftStatus;
         }
-
     }
 
-    // 1. slide is up 90 degrees
-    // 2. claw is open
-    // 3. elevator down
-    // 4. frontArm all the way back
-    public class ReadySpecimen implements Action {
+    // This action initializes all servos to the correct position for specimen collection
+    private class ReadySpecimen implements Action {
         private double clawPos = 0.48;
-        private double rotPos  = 0.2;
-        private boolean liftStat = true;
+        private double rotPos  = 0.85;
         private boolean slideStat = true;
+
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             claw.setPosition(clawPos);
             rotator.setPosition(rotPos);
-            sleep(500);
+
+            // Ensure the slide action is performed
             if (slideStat) {
                 slideStat = slideActions.SlideUp().run(telemetryPacket);
             }
-            if (liftStat) {
-                liftStat = liftActions.liftDown().run(telemetryPacket);
-            }
-            return slideStat && liftStat;
+            return slideStat;
         }
     }
 
+    public Action readySpecimen() {
+        return new ReadySpecimen();
+    }
 
     public Action grabCubeFromTray() {
         return new grabCubeFromTray();

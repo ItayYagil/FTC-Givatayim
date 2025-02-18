@@ -123,7 +123,7 @@ public class ActionsTest extends LinearOpMode {
                 }
 
                 if (gamepad1.a) {
-                    rotator.setPosition(0.25);
+
                 }
                 if (gamepad1.y) {
                     rotator.setPosition(0.85);
