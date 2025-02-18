@@ -65,15 +65,15 @@ public class PrimaryOpMode extends LinearOpMode {
         Servo clawServo       = hardwareMap.servo.get("clawServo");
 
         CRServo leftSpinArm   = hardwareMap.crservo.get("leftSpinner");
-        Servo leftSlide       = hardwareMap.servo.get("leftSlider");
-        Servo rightSlide      = hardwareMap.servo.get("rightSlider");
+        CRServo leftSlide       = hardwareMap.crservo.get("leftSlider");
+        CRServo rightSlide      = hardwareMap.crservo.get("rightSlider");
 
         DcMotor leftDrive  = hardwareMap.get(DcMotor.class, "armLeft");
         DcMotor rightDrive = hardwareMap.get(DcMotor.class, "armRight");
         DcMotor frontArmMotor          = hardwareMap.get(DcMotor.class, "frontArm");
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        // rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // make the motors brake when [power == 0]
@@ -220,10 +220,10 @@ public class PrimaryOpMode extends LinearOpMode {
                                   Front Arm
                ################################################## */
 
-            if (gamepad1.right_bumper || gamepad1.right_trigger > 0) {
+            if (gamepad1.right_trigger > 0) {
                 frontArmMotor.setPower(1);
             }
-            else if (gamepad1.left_bumper || gamepad1.left_trigger > 0) {
+            else if ( gamepad1.left_trigger > 0) {
                 frontArmMotor.setPower(-1);
             }
             else frontArmMotor.setPower(0);
@@ -253,6 +253,19 @@ public class PrimaryOpMode extends LinearOpMode {
                 leftDrive.setTargetPosition(0);
                 rightDrive.setTargetPosition(0);
             }
+
+
+
+            while (gamepad2.b) {
+                leftSlide.setPower(1);
+                rightSlide.setPower(-1);
+            }
+            while (gamepad2.a) {
+                leftSlide.setPower(-1);
+                rightSlide.setPower(1);
+            }
+            leftSlide.setPower(0);
+            rightSlide.setPower(0);
 
              /* ######################################################
                    Runs Autonomous Actions in TeleOp - TODO: Enable
@@ -315,8 +328,7 @@ public class PrimaryOpMode extends LinearOpMode {
             // Servo Positions
             telemetry.addData("Claw Servo Position", clawServo.getPosition());
             telemetry.addData("Rotator Servo Position", rotator.getPosition());
-            telemetry.addData("Left Slide Servo Position", leftSlide.getPosition());
-            telemetry.addData("Right Slide Servo Position", rightSlide.getPosition());
+
 
             telemetry.update();
 
