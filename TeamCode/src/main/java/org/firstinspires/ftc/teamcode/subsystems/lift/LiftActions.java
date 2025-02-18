@@ -23,6 +23,7 @@ public class LiftActions {
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);

@@ -74,6 +74,7 @@ public class PrimaryOpMode extends LinearOpMode {
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // make the motors brake when [power == 0]
         // should stop the elevator from retracting because of gravity...

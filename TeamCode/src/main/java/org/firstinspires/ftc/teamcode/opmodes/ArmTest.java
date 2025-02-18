@@ -17,8 +17,6 @@ public class ArmTest extends LinearOpMode {
         public double copen = 0.48;
         public double cclose= 0.448;
         public double slup = 0.5;
-
-        public double lext = 0.5;
     }
     public static Params PARAMS = new Params();
 
@@ -34,8 +32,8 @@ public class ArmTest extends LinearOpMode {
         Servo rights = hardwareMap.servo.get("rightSlider");
         Servo claw = hardwareMap.servo.get("clawServo");
 
-        CRServo spinl = hardwareMap.crservo.get("leftSpinner");
-        //Servo spinr = hardwareMap.servo.get("rightSpinner");
+        //Servo spinl = hardwareMap.servo.get("leftSpinner");
+        //v Servo spinr = hardwareMap.servo.get("rightSpinner");
 
 //        CRServo slideServo = hardwareMap.get(CRServo.class, "slideServo");
 
@@ -44,7 +42,7 @@ public class ArmTest extends LinearOpMode {
         frontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
-//        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        //rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // make the motors brake when [power == 0]
@@ -57,7 +55,6 @@ public class ArmTest extends LinearOpMode {
         int rightStartingPos = rightDrive.getCurrentPosition();
         int leftStartingPos = leftDrive.getCurrentPosition();
 
-
         rightDrive.setTargetPosition(rightStartingPos);
         leftDrive.setTargetPosition(leftStartingPos);
         //frontDrive.setTargetPosition(frontStartingPos);
@@ -66,8 +63,6 @@ public class ArmTest extends LinearOpMode {
         leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         frontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        spinl.setDirection(DcMotorSimple.Direction.FORWARD);
-
         waitForStart();
         if (opModeIsActive()) {
 
@@ -75,11 +70,16 @@ public class ArmTest extends LinearOpMode {
             while (opModeIsActive()) {
                 // Extend / Retract
                 if (gamepad2.right_bumper) {
-                    spinl.setPower(1);
-                    //spinr.setPosition(PARAMS.lext);
+                    leftDrive.setPower(1);
+                    rightDrive.setPower(1);
+
+                    leftDrive.setTargetPosition(3750);
+                    rightDrive.setTargetPosition(3750);
                 } else if (gamepad2.left_bumper) {
-                    spinl.setPower(0);
-                    //spinr.setPosition(0);
+                    leftDrive.setPower(1);
+                    rightDrive.setPower(1);
+                    leftDrive.setTargetPosition(0);
+                    rightDrive.setTargetPosition(0);
                 }
 
                 // TODO: Change to targetposition movement once motor is actually fixed
@@ -116,11 +116,10 @@ public class ArmTest extends LinearOpMode {
 
                 /* ##################################################
                              TELEMETRY ADDITIONS
-                   ################################################## */
+               ################################################## */
                 telemetry.addData("Right: ", rightDrive.getCurrentPosition());
                 telemetry.addData("Left: ",  leftDrive.getCurrentPosition());
                 telemetry.addData("Front: ", frontDrive.getCurrentPosition());
-                telemetry.addData(":(", spinl.getPower());
 
                 telemetry.update();
             }
