@@ -23,40 +23,51 @@ public class MichaelAutonomous extends LinearOpMode {
   @Override
   public void runOpMode() {
 
-    RightDrive = hardwareMap.get(DcMotor.class, "RightDrive");
-    LeftDrive = hardwareMap.get(DcMotor.class, "LeftDrive");
-    Arm = hardwareMap.get(DcMotor.class, "Arm");
-    Intake = hardwareMap.get(DcMotor.class, "Intake");
+    // Initialize motors
+    frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeft");
+//    backLeftMotor = hardwareMap.get(DcMotor.class, "backLeft");
+//    frontRightMotor = hardwareMap.get(DcMotor.class, "frontRight");
+    backRightMotor = hardwareMap.get(DcMotor.class, "backRight");
 
-    // Reverse left drive motor direction
-    LeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+    // Reverse right side motors
+//    frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+//    backRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
     waitForStart();
-    if (opModeIsActive()) {
-      // Create target positions for a left turn
-      // Here, the left motor will turn backward, and the right motor will move forward for the robot to turn left
-      int rightTarget = RightDrive.getCurrentPosition() + (int)(15 * DRIVE_COUNTS_PER_IN);  // Move right motor forward
-      int leftTarget = LeftDrive.getCurrentPosition() - (int)(15 * DRIVE_COUNTS_PER_IN);   // Move left motor backward
 
-      // Set target position for both motors
-      LeftDrive.setTargetPosition(leftTarget);
-      RightDrive.setTargetPosition(rightTarget);
+    if (opModeIsActive()) {
+      // Set target positions for moving left (negative on left motors, positive on right motors)
+      int rightTarget = backRightMotor.getCurrentPosition() + (int)(15 * DRIVE_COUNTS_PER_IN);  // Move right motor forward
+      int leftTarget = frontLeftMotor.getCurrentPosition() + (int)(15 * DRIVE_COUNTS_PER_IN);    // Move left motor backward
+
+      // Set target position for all motors
+      frontLeftMotor.setTargetPosition(leftTarget);
+//      backLeftMotor.setTargetPosition(leftTarget);
+//      frontRightMotor.setTargetPosition(rightTarget);
+      backRightMotor.setTargetPosition(rightTarget);
 
       // Switch to RUN_TO_POSITION mode
-      LeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-      RightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      frontLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//      backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//      frontRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-      // Run to position at the designated power
-      LeftDrive.setPower(0.5);
-      RightDrive.setPower(0.5);
+      // Set power to move the robot
+      frontLeftMotor.setPower(0.5);
+//      backLeftMotor.setPower(0.5);
+//      frontRightMotor.setPower(0.5);
+      backRightMotor.setPower(0.5);
 
-      // Wait until both motors are no longer busy running to position
-      while (opModeIsActive() && (LeftDrive.isBusy() || RightDrive.isBusy())) {
+      // Wait until all motors finish moving
+      while (opModeIsActive() &&
+              (frontLeftMotor.isBusy()  || backRightMotor.isBusy())) {
       }
 
-      // Set motor power back to 0
-      LeftDrive.setPower(0);
-      RightDrive.setPower(0);
+      // Stop motors after moving
+      frontLeftMotor.setPower(0);
+//      backLeftMotor.setPower(0);
+//      frontRightMotor.setPower(0);
+      backRightMotor.setPower(0);
     }
   }
 }
