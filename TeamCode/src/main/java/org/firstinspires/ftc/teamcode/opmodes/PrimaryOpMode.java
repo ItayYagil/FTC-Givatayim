@@ -70,7 +70,6 @@ public class PrimaryOpMode extends LinearOpMode {
 
         DcMotor leftDrive  = hardwareMap.get(DcMotor.class, "armLeft");
         DcMotor rightDrive = hardwareMap.get(DcMotor.class, "armRight");
-        DcMotor frontArmMotor          = hardwareMap.get(DcMotor.class, "frontArm");
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         // rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -209,12 +208,12 @@ public class PrimaryOpMode extends LinearOpMode {
                ################################################## */
 
             if (gamepad1.right_trigger > 0) {
-                frontArmMotor.setPower(1);
+                frontArm.setPower(1);
             }
             else if ( gamepad1.left_trigger > 0) {
-                frontArmMotor.setPower(-1);
+                frontArm.setPower(-1);
             }
-            else frontArmMotor.setPower(0);
+            else frontArm.setPower(0);
 
             /*###################################################
                                 Spinner
@@ -263,11 +262,18 @@ public class PrimaryOpMode extends LinearOpMode {
                 clawServo.setPosition(0.35); // close
             }
 
-            // ROTATOR SERVO
+//            // ROTATOR SERVO - DISABLED
+//            if (gamepad1.y) {
+//                rotator.setPosition(0.9); // up?
+//            } else if(gamepad1.a) {
+//                rotator.setPosition(0.25); // should be down
+//            }
+
+            if (gamepad1.b) {
+                upReleaseAndReset(clawServo, leftElevator, rightElevator, rotator);
+            }
             if (gamepad1.y) {
-                rotator.setPosition(0.9); // up?
-            } else if(gamepad1.a) {
-                rotator.setPosition(0.25); // should be down
+                grabCubeAndUp(clawServo, leftElevator, rightElevator, rotator);
             }
 
             /* BINDINGS SO FAR - SHOW DRIVERS
@@ -326,7 +332,7 @@ public class PrimaryOpMode extends LinearOpMode {
             // Arm Encoders
             telemetry.addData("Arm Right Position", rightDrive.getCurrentPosition());
             telemetry.addData("Arm Left Position", leftDrive.getCurrentPosition());
-            telemetry.addData("Front Arm Position", frontArmMotor.getCurrentPosition());
+            telemetry.addData("Front Arm Position", frontArm.getCurrentPosition());
 
             // CRServo Debugging
             telemetry.addData("CRServo Power (leftSpinArm)", leftSpinArm.getPower());
@@ -335,7 +341,7 @@ public class PrimaryOpMode extends LinearOpMode {
             telemetry.addData("Spinner Power", spinner.getPower());
 
             // Front Arm Motor
-            telemetry.addData("Front Arm Motor Power", frontArmMotor.getPower());
+            telemetry.addData("Front Arm Motor Power", frontArm.getPower());
 
             // Servo Positions
             telemetry.addData("Claw Servo Position", clawServo.getPosition());
@@ -347,9 +353,27 @@ public class PrimaryOpMode extends LinearOpMode {
         }
     }
 
-    private void resetFrontArm(DcMotor frontArm, int startPos) {
-        frontArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        frontArm.setTargetPosition(startPos);
+    private void grabCubeAndUp(Servo claw, DcMotor leftel, DcMotor rightel, Servo rot) {
+        leftel.setTargetPosition(250);
+        rightel.setTargetPosition(250);
+        rot.setPosition(0.25);
+        sleep(500);
+        claw.setPosition(0.35); // catch
+        sleep(250);
+        rightel.setTargetPosition(3500);
+        leftel.setTargetPosition(3500);
+    }
+
+    private void upReleaseAndReset(Servo claw, DcMotor leftel, DcMotor rightel, Servo rot) {
+        leftel.setTargetPosition(3500);
+        rightel.setTargetPosition(3500);
+        sleep(250);
+        rot.setPosition(1);
+        claw.setPosition(0.5);
+        sleep(250);
+        rot.setPosition(0.25);
+        rightel.setTargetPosition(250);
+        leftel.setTargetPosition(250);
     }
 
     private double unwrapAngle(double previousAngle, double currentAngle) {
