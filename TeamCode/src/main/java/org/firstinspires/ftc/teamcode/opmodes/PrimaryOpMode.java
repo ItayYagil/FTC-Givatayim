@@ -174,6 +174,18 @@ public class PrimaryOpMode extends LinearOpMode {
                 isSpinArmDown = true;
             }
 
+            // action
+            if (gamepad1.dpad_down) {
+                ComplexActions liftActions = new ComplexActions(hardwareMap, leftStartingPos, rightStartingPos);
+                TelemetryPacket packet = new TelemetryPacket();
+                if (!liftActions.readySpecimen().run(packet)) {
+                    // If the action isn't finished, keep showing it
+                    telemetry.addData("Lift Action", "Running...");
+                } else {
+                    telemetry.addData("Lift Action", "Completed");
+                }
+            }
+
             /* ##################################################
                         Movement Controls Calculations
                ################################################## */
@@ -233,51 +245,27 @@ public class PrimaryOpMode extends LinearOpMode {
                 leftDrive.setPower(1);
                 rightDrive.setPower(1);
 
-                leftDrive.setTargetPosition(3500);
-                rightDrive.setTargetPosition(3500);
+                leftDrive.setTargetPosition(3750);
+                rightDrive.setTargetPosition(3750);
             } else if (gamepad2.left_bumper) {
                 leftDrive.setPower(1);
                 rightDrive.setPower(1);
-                leftDrive.setTargetPosition(250);
-                rightDrive.setTargetPosition(250);
+                leftDrive.setTargetPosition(0);
+                rightDrive.setTargetPosition(0);
             }
 
-            while (gamepad2.y) {
+
+
+            while (gamepad2.dpad_up) {
                 leftSlide.setPower(1);
                 rightSlide.setPower(-1);
             }
-            while (gamepad2.a) {
+            while (gamepad2.dpad_down) {
                 leftSlide.setPower(-1);
                 rightSlide.setPower(1);
             }
             leftSlide.setPower(0);
             rightSlide.setPower(0);
-
-            /// THIS IS NEW STUFF FOR CLAW AND ROT ///
-            /// CHANGE BINDINGS ACCORDING TO DRIVERS
-
-            // CLAW SERVO
-            if (gamepad2.b) {
-                clawServo.setPosition(0.48); // open
-            } else if(gamepad2.x) {
-                clawServo.setPosition(0.35); // close
-            }
-
-            // ROTATOR SERVO
-            if (gamepad1.y) {
-                rotator.setPosition(0.9); // up?
-            } else if(gamepad1.a) {
-                rotator.setPosition(0.25); // should be down
-            }
-
-            /* BINDINGS SO FAR - SHOW DRIVERS
-            - frontarm forwards/backwards: right/left triggers - gamepad 1
-            - spinner action: a - gamepad 1
-            - rotatorarm up/down: y/a - gamepad 1
-            - slide up/down: y/a - gamepad 2
-            - claw open/close: b/x gamepad 2
-            - elevator up/down: right/left bumpers: gamepad 2
-             */
 
              /* ######################################################
                    Runs Autonomous Actions in TeleOp - TODO: Enable

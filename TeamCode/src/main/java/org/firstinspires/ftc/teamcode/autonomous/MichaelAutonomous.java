@@ -10,8 +10,6 @@ public class MichaelAutonomous extends LinearOpMode {
 
   private DcMotor RightDrive;
   private DcMotor LeftDrive;
-  private DcMotor Arm;
-  private DcMotor Intake;
   
   // Convert from the counts per revolution of the encoder to counts per inch
   static final double HD_COUNTS_PER_REV = 28;
@@ -23,10 +21,9 @@ public class MichaelAutonomous extends LinearOpMode {
   @Override
   public void runOpMode() {
 
-    RightDrive = hardwareMap.get(DcMotor.class, "RightDrive");
-    LeftDrive = hardwareMap.get(DcMotor.class, "LeftDrive");
-    Arm = hardwareMap.get(DcMotor.class, "Arm");
-    Intake = hardwareMap.get(DcMotor.class, "Intake");
+    RightDrive = hardwareMap.get(DcMotor.class, "frontRight");
+    LeftDrive = hardwareMap.get(DcMotor.class, "backLeft");
+
 
     // Reverse left drive motor direction
     LeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
