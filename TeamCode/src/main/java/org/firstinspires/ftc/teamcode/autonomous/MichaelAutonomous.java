@@ -8,12 +8,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 @Autonomous
 public class MichaelAutonomous extends LinearOpMode {
 
-  private DcMotor frontLeft;
-  private DcMotor frontRight;
-  private DcMotor backLeft;
-  private DcMotor backRight;
+  private DcMotor RightDrive;
+  private DcMotor LeftDrive;
+  private DcMotor Arm;
+  private DcMotor Intake;
 
-  // Constants
+  // Convert from the counts per revolution of the encoder to counts per inch
   static final double HD_COUNTS_PER_REV = 28;
   static final double DRIVE_GEAR_REDUCTION = 20.15293;
   static final double WHEEL_CIRCUMFERENCE_MM = 90 * Math.PI;
@@ -22,73 +22,41 @@ public class MichaelAutonomous extends LinearOpMode {
 
   @Override
   public void runOpMode() {
-    // Initialize motors
-    frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-    frontRight = hardwareMap.get(DcMotor.class, "frontRight");
-    backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-    backRight = hardwareMap.get(DcMotor.class, "backRight");
 
-    // Set motor directions for strafing
-    frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-    backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+    RightDrive = hardwareMap.get(DcMotor.class, "RightDrive");
+    LeftDrive = hardwareMap.get(DcMotor.class, "LeftDrive");
+    Arm = hardwareMap.get(DcMotor.class, "Arm");
+    Intake = hardwareMap.get(DcMotor.class, "Intake");
 
-    // Set all motors to brake mode
-    frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-    backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    // Reverse left drive motor direction
+    LeftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
 
     waitForStart();
     if (opModeIsActive()) {
-      // Move a few feet to the left (change the value as needed)
-      strafeLeft(24, 0.5);  // 24 inches at 50% power
+      // Create target positions for a left turn
+      // Here, the left motor will turn backward, and the right motor will move forward for the robot to turn left
+      int rightTarget = RightDrive.getCurrentPosition() + (int)(15 * DRIVE_COUNTS_PER_IN);  // Move right motor forward
+      int leftTarget = LeftDrive.getCurrentPosition() - (int)(15 * DRIVE_COUNTS_PER_IN);   // Move left motor backward
+
+      // Set target position for both motors
+      LeftDrive.setTargetPosition(leftTarget);
+      RightDrive.setTargetPosition(rightTarget);
+
+      // Switch to RUN_TO_POSITION mode
+      LeftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+      RightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+      // Run to position at the designated power
+      LeftDrive.setPower(0.5);
+      RightDrive.setPower(0.5);
+
+      // Wait until both motors are no longer busy running to position
+      while (opModeIsActive() && (LeftDrive.isBusy() || RightDrive.isBusy())) {
+      }
+
+      // Set motor power back to 0
+      LeftDrive.setPower(0);
+      RightDrive.setPower(0);
     }
-  }
-
-  private void strafeLeft(double inches, double power) {
-    int moveCounts = (int) (inches * DRIVE_COUNTS_PER_IN);
-
-    // Calculate target positions for strafing left
-    int frontLeftTarget = frontLeft.getCurrentPosition() - moveCounts;
-    int frontRightTarget = frontRight.getCurrentPosition() + moveCounts;
-    int backLeftTarget = backLeft.getCurrentPosition() + moveCounts;
-    int backRightTarget = backRight.getCurrentPosition() - moveCounts;
-
-    // Set target positions
-    frontLeft.setTargetPosition(frontLeftTarget);
-    frontRight.setTargetPosition(frontRightTarget);
-    backLeft.setTargetPosition(backLeftTarget);
-    backRight.setTargetPosition(backRightTarget);
-
-    // Switch to RUN_TO_POSITION mode
-    frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-    // Set power for strafing
-    frontLeft.setPower(power);
-    frontRight.setPower(power);
-    backLeft.setPower(power);
-    backRight.setPower(power);
-
-    // Wait until all motors finish moving
-    while (opModeIsActive() &&
-            (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy())) {
-      telemetry.addData("Strafing", "Left");
-      telemetry.update();
-    }
-
-    // Stop all motors
-    frontLeft.setPower(0);
-    frontRight.setPower(0);
-    backLeft.setPower(0);
-    backRight.setPower(0);
-
-    // Reset motors to normal mode
-    frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
   }
 }
